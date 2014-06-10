@@ -6,13 +6,13 @@
 #
 # To run in parallel on a string stored in variable `text`:
 #  julia -p <N> 
-#  julia> @everywhere load("<julia_dir>/examples/wordcount.j")
+#  julia> require("<julia_dir>/examples/wordcount.j")
 #  julia> ...(define text)...
 #  julia> counts=parallel_wordcount(text)
 #
 # Or to run on a group of files, writing results to an output file:
 #  julia -p <N>
-#  julia> @everywhere load("<julia_dir/examples/wordcount.j")
+#  julia> require("<julia_dir/examples/wordcount.j")
 #  julia> wordcount_files("/tmp/output.txt", "/tmp/input1.txt","/tmp/input2.txt",...) 
 
 # "Map" function.
@@ -58,11 +58,11 @@ function parallel_wordcount(text)
             last=length(lines)
         end
         subtext=join(lines[int(first):int(last)],"\n")
-        push(rrefs, @spawn wordcount( subtext ) )
+        push!(rrefs, @spawn wordcount( subtext ) )
     end
     # fetch results
     while length(rrefs)>0
-        push(wcounts,fetch(pop(rrefs)))
+        push!(wcounts,fetch(pop!(rrefs)))
     end
     # reduce
     count=wcreduce(wcounts)
